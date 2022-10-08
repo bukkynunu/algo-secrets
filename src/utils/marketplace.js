@@ -36,8 +36,6 @@ const compileProgram = async (programSource) => {
 
 // CREATE secret: ApplicationCreateTxn
 export const addSecretAction = async (senderAddress, secret) => {
-    console.log("Adding secret...")
-    console.log(secret);
     let params = await algodClient.getTransactionParams().do();
     params.fee = algosdk.ALGORAND_MIN_TX_FEE;
     params.flatFee = true;
@@ -90,14 +88,42 @@ export const addSecretAction = async (senderAddress, secret) => {
     return appId;
 }
 
+
+
+export const optIn = async (senderAddress, appId) => {
+    let accountInfo = await indexerClient.lookupAccountByID(senderAddress).do();
+    let optInApps  = accountInfo.account["apps-local-state"];
+    if(optInApps.find(app => app.id === appId) !== undefined){
+        return;
+    }
+    
+    let params = await algodClient.getTransactionParams().do();
+
+
+    // create unsigned transaction
+    let txn = algosdk.makeApplicationOptInTxn(senderAddress, params, appId);
+
+    // Get transaction ID
+    let txId = txn.txID().toString();
+
+    // Sign & submit the transaction
+    let signedTxn = await myAlgoConnect.signTransaction(txn.toByte());
+    console.log("Signed transaction with txID: %s", txId);
+    await algodClient.sendRawTransaction(signedTxn.blob).do();
+
+    // Wait for transaction to be confirmed
+    let confirmedTxn = await algosdk.waitForConfirmation(algodClient, txId, 4);
+
+    // Get the completed Transaction
+    console.log("Transaction " + txId + " confirmed in round " + confirmedTxn["confirmed-round"]);
+}
+
 // LIKE secret: Group transaction consisting of ApplicationCallTxn and PaymentTxn
 export const likeSecretAction = async (senderAddress, secret) => {
-    console.log("Liking secret...", senderAddress);
 
     let params = await algodClient.getTransactionParams().do();
     params.fee = algosdk.ALGORAND_MIN_TX_FEE;
     params.flatFee = true;
-
     // Build required app args as Uint8Array
     let likeArg = new TextEncoder().encode("like")
     let appArgs = [likeArg]
@@ -127,7 +153,6 @@ export const likeSecretAction = async (senderAddress, secret) => {
 
     // Sign & submit the group transaction
     let signedTxn = await myAlgoConnect.signTransaction(txnArray.map(txn => txn.toByte()));
-    console.log("Signed group transaction");
     let tx = await algodClient.sendRawTransaction(signedTxn.map(txn => txn.blob)).do();
 
     // Wait for group transaction to be confirmed
@@ -241,8 +266,6 @@ export const getSecretsAction = async () => {
            
         }
     }
-    console.log("secrets fetched.")
-    console.log(secrets)
     return secrets
 }
 

@@ -4,7 +4,7 @@ import { useState} from 'react';
 import { indexerClient, myAlgoConnect } from "./utils/constants";
 import { microAlgosToString } from './utils/conversions';
 import Cover from "./Cover";
-import { addSecretAction, dislikeSecretAction, getSecretsAction, likeSecretAction } from './utils/marketplace';
+import { addSecretAction, dislikeSecretAction, getSecretsAction, likeSecretAction, optIn } from './utils/marketplace';
 
 
 
@@ -32,7 +32,6 @@ function App() {
     myAlgoConnect.connect()
       .then(accounts => {
         const _account = accounts[0];
-        console.log(_account)
         setAddress(_account.address);
         fetchBalance(_account.address);
         if (_account.address) getSecrets(_account.address);
@@ -57,6 +56,7 @@ function App() {
   };
 
   const like = async (secret) => {
+    await optIn(address, secret.appId)
     likeSecretAction(address, secret)
       .then(() => {
         getSecrets(address);
@@ -126,7 +126,7 @@ function App() {
           <section id="steps" className="steps section-bg">
             <div className="container">
               <div className="row no-gutters">
-                {secrets.map(secret => <div className="col-lg-4 col-md-6 content-item" data-aos="fade-in">
+                {secrets.map(secret => <div className="col-lg-4 col-md-6 content-item" data-aos="fade-in" key={secret.appId}>
                   <span>{secret.secret}</span>
                   <p>{secret.appId}</p>
                   <br />

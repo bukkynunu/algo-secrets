@@ -36,8 +36,7 @@ const compileProgram = async (programSource) => {
 
 // CREATE secret: ApplicationCreateTxn
 export const addSecretAction = async (senderAddress, secret) => {
-    console.log("Adding secret...")
-    console.log(secret);
+    
     let params = await algodClient.getTransactionParams().do();
     params.fee = algosdk.ALGORAND_MIN_TX_FEE;
     params.flatFee = true;
@@ -74,25 +73,25 @@ export const addSecretAction = async (senderAddress, secret) => {
 
     // Sign & submit the transaction
     let signedTxn = await myAlgoConnect.signTransaction(txn.toByte());
-    console.log("Signed transaction with txID: %s", txId);
+    
     await algodClient.sendRawTransaction(signedTxn.blob).do();
 
     // Wait for transaction to be confirmed
     let confirmedTxn = await algosdk.waitForConfirmation(algodClient, txId, 4);
 
     // Get the completed Transaction
-    console.log("Transaction " + txId + " confirmed in round " + confirmedTxn["confirmed-round"]);
+    
 
     // Get created application id and notify about completion
     let transactionResponse = await algodClient.pendingTransactionInformation(txId).do();
     let appId = transactionResponse['application-index'];
-    console.log("Created new app-id: ", appId);
+    
     return appId;
 }
 
 // LIKE secret: Group transaction consisting of ApplicationCallTxn and PaymentTxn
 export const likeSecretAction = async (senderAddress, secret) => {
-    console.log("Liking secret...", senderAddress);
+    
 
     let params = await algodClient.getTransactionParams().do();
     params.fee = algosdk.ALGORAND_MIN_TX_FEE;
@@ -127,20 +126,20 @@ export const likeSecretAction = async (senderAddress, secret) => {
 
     // Sign & submit the group transaction
     let signedTxn = await myAlgoConnect.signTransaction(txnArray.map(txn => txn.toByte()));
-    console.log("Signed group transaction");
+    
     let tx = await algodClient.sendRawTransaction(signedTxn.map(txn => txn.blob)).do();
 
     // Wait for group transaction to be confirmed
     let confirmedTxn = await algosdk.waitForConfirmation(algodClient, tx.txId, 4);
 
     // Notify about completion
-    console.log("Group transaction " + tx.txId + " confirmed in round " + confirmedTxn["confirmed-round"]);
+    
 }
 
 
 // DISLIKE secret: Group transaction consisting of ApplicationCallTxn and PaymentTxn
 export const dislikeSecretAction = async (senderAddress, secret) => {
-    console.log("Disliking secret...", senderAddress);
+    
 
     let params = await algodClient.getTransactionParams().do();
     params.fee = algosdk.ALGORAND_MIN_TX_FEE;
@@ -175,19 +174,19 @@ export const dislikeSecretAction = async (senderAddress, secret) => {
 
     // Sign & submit the group transaction
     let signedTxn = await myAlgoConnect.signTransaction(txnArray.map(txn => txn.toByte()));
-    console.log("Signed group transaction");
+    
     let tx = await algodClient.sendRawTransaction(signedTxn.map(txn => txn.blob)).do();
 
     // Wait for group transaction to be confirmed
     let confirmedTxn = await algosdk.waitForConfirmation(algodClient, tx.txId, 4);
 
     // Notify about completion
-    console.log("Group transaction " + tx.txId + " confirmed in round " + confirmedTxn["confirmed-round"]);
+    
 }
 
 
 export const deleteProductAction = async (senderAddress, index) => {
-    console.log("Deleting application...");
+    
 
     let params = await algodClient.getTransactionParams().do();
     params.fee = algosdk.ALGORAND_MIN_TX_FEE;
@@ -203,23 +202,23 @@ export const deleteProductAction = async (senderAddress, index) => {
 
     // Sign & submit the transaction
     let signedTxn = await myAlgoConnect.signTransaction(txn.toByte());
-    console.log("Signed transaction with txID: %s", txId);
+    
     await algodClient.sendRawTransaction(signedTxn.blob).do();
 
     // Wait for transaction to be confirmed
     const confirmedTxn = await algosdk.waitForConfirmation(algodClient, txId, 4);
 
     // Get the completed Transaction
-    console.log("Transaction " + txId + " confirmed in round " + confirmedTxn["confirmed-round"]);
+    
 
     // Get application id of deleted application and notify about completion
     let transactionResponse = await algodClient.pendingTransactionInformation(txId).do();
     let appId = transactionResponse['txn']['txn'].apid;
-    console.log("Deleted app-id: ", appId);
+    
 }
 
 export const getSecretsAction = async () => {
-    console.log("Fetching secrets...")
+    
     let note = new TextEncoder().encode(marketplaceNote);
     let encodedNote = Buffer.from(note).toString("base64");
 
@@ -241,8 +240,7 @@ export const getSecretsAction = async () => {
            
         }
     }
-    console.log("secrets fetched.")
-    console.log(secrets)
+    
     return secrets
 }
 

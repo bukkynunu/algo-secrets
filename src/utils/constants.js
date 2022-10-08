@@ -23,9 +23,9 @@ export const minRound = 21540981;
 export const marketplaceNote = "secrets:uv1"
 
 // Maximum local storage allocation, immutable
-export const numLocalInts = 0;
+export const numLocalInts = 1; // Boolean: Liked
 export const numLocalBytes = 0;
 // Maximum global storage allocation, immutable
-export const numGlobalInts = 2; // Global variables stored as Int: count, sold
-export const numGlobalBytes = 3; // Global variables stored as Bytes: name, description, image
+export const numGlobalInts = 1; // Global variables stored as Int: likes
+export const numGlobalBytes = 3; // Global variables stored as Bytes: secrets, owner, address
 export const ALGORAND_DECIMALS = 6; 
